@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react";
 
 /*
     #1: Why move to a reducer?
@@ -6,6 +6,4 @@ import * as React from 'react'
     Is not useState enough?
 */
 
-const MyComponent = () => {
-    
-}
+const MyComponent = () => {};

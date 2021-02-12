@@ -1,13 +1,28 @@
-import * as React from 'react'
+import * as React from "react";
 
 /*
-    #8: The implicit states
+    #11: Using states in a reducer
 
-    NOT_LOADED, LOADING, LOADED and ERROR
+    Making the implicit states explicit
 */
 
-const state = {
-    isLoading: false,
-    data: [],
-    error: null
-}
+const MyComponent = () => {
+  const [todos, dispatch] = React.useReducer(
+    (todos, action) => {
+      switch (action.type) {
+        case "FETCH_TODOS":
+          return { isLoading: true, error: null };
+        case "FETCH_TODOS_SUCCESS":
+          return { isLoading: false, data: action.data };
+        case "FETCH_TODOS_ERROR":
+          return { isLoading: false, error: action.error };
+      }
+      return todos;
+    },
+    {
+      isLoading: true,
+      error: null,
+      data: [],
+    }
+  );
+};

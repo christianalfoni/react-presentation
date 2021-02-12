@@ -1,20 +1,59 @@
-import * as React from 'react'
-import { transition } from './react-states'
+import axios from "axios";
+import * as React from "react";
+import { transition, exec, transform } from "./react-states";
 
 /*
-    #12: Constraining states
+    #15: Creating a context
 */
 
 const MyComponent = () => {
-    const [todos, dispatch] = React.useReducer((todos, action) => {
-        switch (action.type) {
-            case 'FETCH_TODOS':
-                return { state: 'LOADING' }
-            case 'FETCH_TODOS_SUCCESS':
-                return { state: 'LOADED', data: action.data }
-            case 'FETCH_TODOS_ERROR':
-                return { state: 'ERROR', error: action.error }
-        }
-        return todos
-    }, { state: 'NOT_LOADED' })
-}
+  const [todos, dispatch] = React.useReducer(
+    (todos, action) =>
+      transition(todos, action, {
+        NOT_LOADED: {
+          FETCH_TODOS: () => ({ state: "LOADING" }),
+        },
+        LOADING: {
+          FETCH_TODOS_SUCCESS: ({ data }) => ({ state: "LOADED", data }),
+          FETCH_TODOS_ERROR: ({ error }) => ({ state: "ERROR", error }),
+        },
+        LOADED: {},
+        ERROR: {},
+      }),
+    { state: "NOT_LOADED" }
+  );
+
+  React.useEffect(
+    () =>
+      exec(todos, {
+        LOADING: () => {
+          axios
+            .get("/todos")
+            .then((response) => {
+              dispatch({ type: "FETCH_TODOS_SUCCESS", data: response.data });
+            })
+            .catch((error) => {
+              dispatch({ type: "FETCH_TODOS_ERROR", error: error.message });
+            });
+        },
+      }),
+    [todos]
+  );
+
+  return (
+    <div>
+      {transform(todos, {
+        NOT_LOADED: () => "Not loaded...",
+        LOADING: () => "Loading",
+        LOADED: ({ data }) => (
+          <ul>
+            {data.map((todo) => (
+              <li>{todo.title}</li>
+            ))}
+          </ul>
+        ),
+        ERROR: ({ error }) => `Error: ${error}`,
+      })}
+    </div>
+  );
+};
