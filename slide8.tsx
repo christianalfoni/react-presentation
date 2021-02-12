@@ -11,11 +11,11 @@ const MyComponent = () => {
     (todos, action) => {
       switch (action.type) {
         case "FETCH_TODOS":
-          return { isLoading: true, error: null };
+          return { ...todos, isLoading: true };
         case "FETCH_TODOS_SUCCESS":
-          return { isLoading: false, data: action.data };
+          return { ...todos, isLoading: false, data: action.data };
         case "FETCH_TODOS_ERROR":
-          return { isLoading: false, error: action.error };
+          return { ...todos, isLoading: false, error: action.error };
       }
       return todos;
     },
