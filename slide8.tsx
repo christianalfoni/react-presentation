@@ -1,9 +1,7 @@
 import * as React from "react";
 
 /*
-    #11: Using states in a reducer
-
-    Making the implicit states explicit
+    #8: Constraining states
 */
 
 const MyComponent = () => {
@@ -11,18 +9,14 @@ const MyComponent = () => {
     (todos, action) => {
       switch (action.type) {
         case "FETCH_TODOS":
-          return { ...todos, isLoading: true };
+          return { state: "LOADING" };
         case "FETCH_TODOS_SUCCESS":
-          return { ...todos, isLoading: false, data: action.data };
+          return { state: "LOADED", data: action.data };
         case "FETCH_TODOS_ERROR":
-          return { ...todos, isLoading: false, error: action.error };
+          return { state: "ERROR", error: action.error };
       }
       return todos;
     },
-    {
-      isLoading: true,
-      error: null,
-      data: [],
-    }
+    { state: "NOT_LOADED" }
   );
 };

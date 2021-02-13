@@ -1,26 +1,28 @@
 import * as React from "react";
 
 /*
-    #10: The implicit states
+    #7: Using states in a reducer
+
+    Making the implicit states explicit
 */
 
-type Todos =
-  | {
-      state: "NOT_LOADED";
+const MyComponent = () => {
+  const [todos, dispatch] = React.useReducer(
+    (todos, action) => {
+      switch (action.type) {
+        case "FETCH_TODOS":
+          return { ...todos, isLoading: true };
+        case "FETCH_TODOS_SUCCESS":
+          return { ...todos, isLoading: false, data: action.data };
+        case "FETCH_TODOS_ERROR":
+          return { ...todos, isLoading: false, error: action.error };
+      }
+      return todos;
+    },
+    {
+      isLoading: true,
+      error: null,
+      data: [],
     }
-  | {
-      state: "LOADING";
-    }
-  | {
-      state: "LOADED";
-      data: Todo[];
-    }
-  | {
-      state: "ERROR";
-      error: string;
-    };
-
-type Todo = {
-  title: string;
-  completed: boolean;
+  );
 };

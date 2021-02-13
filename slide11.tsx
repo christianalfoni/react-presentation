@@ -1,17 +1,10 @@
 import axios from "axios";
 import * as React from "react";
+import { transition, exec, transform } from "react-states";
 
 /*
-    #14: Rendering states
+    #11: Creating a context
 */
-
-const transition = (state, action, transitions) =>
-  transitions[state.state] && transitions[state.state][action.type]
-    ? transitions[state.state][action.type](action, state)
-    : state;
-
-const exec = (state, effects) =>
-  effects[state.state] && effects[state.state](state);
 
 const MyComponent = () => {
   const [todos, dispatch] = React.useReducer(
@@ -27,9 +20,7 @@ const MyComponent = () => {
         LOADED: {},
         ERROR: {},
       }),
-    {
-      state: "NOT_LOADED",
-    }
+    { state: "NOT_LOADED" }
   );
 
   React.useEffect(
@@ -49,5 +40,20 @@ const MyComponent = () => {
     [todos]
   );
 
-  return <div className="wrapper"></div>;
+  return (
+    <div>
+      {transform(todos, {
+        NOT_LOADED: () => "Not loaded...",
+        LOADING: () => "Loading",
+        LOADED: ({ data }) => (
+          <ul>
+            {data.map((todo) => (
+              <li>{todo.title}</li>
+            ))}
+          </ul>
+        ),
+        ERROR: ({ error }) => `Error: ${error}`,
+      })}
+    </div>
+  );
 };

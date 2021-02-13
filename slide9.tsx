@@ -1,7 +1,8 @@
+import axios from "axios";
 import * as React from "react";
 
 /*
-    #12: Constraining states
+    #9: Constraining logic
 */
 
 const MyComponent = () => {
@@ -9,14 +10,30 @@ const MyComponent = () => {
     (todos, action) => {
       switch (action.type) {
         case "FETCH_TODOS":
-          return { state: "LOADING" };
+          return { ...todos, isLoading: true };
         case "FETCH_TODOS_SUCCESS":
-          return { state: "LOADED", data: action.data };
+          return { ...todos, isLoading: false, data: action.data };
         case "FETCH_TODOS_ERROR":
-          return { state: "ERROR", error: action.error };
+          return { ...todos, isLoading: false, error: action.error };
       }
       return todos;
     },
-    { state: "NOT_LOADED" }
+    {
+      isLoading: true,
+      error: null,
+      data: [],
+    }
   );
+
+  const fetchTodos = React.useCallback(() => {
+    dispatch({ type: "FETCH_TODOS" });
+    axios
+      .get("/todos")
+      .then((response) => {
+        dispatch({ type: "FETCH_TODOS_SUCCESS", data: response.data });
+      })
+      .catch((error) => {
+        dispatch({ type: "FETCH_TODOS_ERROR", error: error.message });
+      });
+  }, []);
 };
